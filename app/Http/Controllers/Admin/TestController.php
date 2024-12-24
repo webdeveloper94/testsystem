@@ -42,8 +42,11 @@ class TestController extends Controller
             'questions' => 'required|array|min:1',
             'questions.*.text' => 'required|string',
             'questions.*.correct_answer' => 'required|integer|min:0|max:3',
-            'questions.*.answers' => 'required|array|size:4',
-            'questions.*.answers.*' => 'required|string',
+            'questions.*.answers' => 'required|array|min:2',
+            'questions.*.answers.0' => 'required|string', // First answer is required
+            'questions.*.answers.1' => 'required|string', // Second answer is required
+            'questions.*.answers.2' => 'nullable|string', // Third answer is optional
+            'questions.*.answers.3' => 'nullable|string', // Fourth answer is optional
             'questions.*.image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
@@ -77,13 +80,16 @@ class TestController extends Controller
                 // Convert numeric correct answer (0-3) to letter (a-d)
                 $correctOption = chr(97 + $questionData['correct_answer']); // 0->a, 1->b, 2->c, 3->d
 
+                // Get answers array
+                $answers = $questionData['answers'];
+
                 // Create question with options
                 $question = $test->questions()->create([
                     'question_text' => $questionData['text'],
-                    'option_a' => $questionData['answers'][0],
-                    'option_b' => $questionData['answers'][1],
-                    'option_c' => $questionData['answers'][2],
-                    'option_d' => $questionData['answers'][3],
+                    'option_a' => $answers[0],
+                    'option_b' => $answers[1],
+                    'option_c' => isset($answers[2]) ? $answers[2] : null,
+                    'option_d' => isset($answers[3]) ? $answers[3] : null,
                     'correct_option' => $correctOption
                 ]);
             }

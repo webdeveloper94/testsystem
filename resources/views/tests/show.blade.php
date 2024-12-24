@@ -62,6 +62,7 @@
                                 <span class="text-gray-300">{{ $question->option_b }}</span>
                             </label>
 
+                            @if($question->option_c)
                             <label class="flex items-center p-4 border border-gray-700 rounded-lg cursor-pointer transition-all duration-300 hover:bg-gray-700 option-label">
                                 <input type="radio" name="question_{{ $question->id }}" value="c" class="hidden">
                                 <div class="w-6 h-6 border-2 border-blue-500 rounded-full mr-3 flex items-center justify-center option-radio">
@@ -69,7 +70,9 @@
                                 </div>
                                 <span class="text-gray-300">{{ $question->option_c }}</span>
                             </label>
+                            @endif
 
+                            @if($question->option_d)
                             <label class="flex items-center p-4 border border-gray-700 rounded-lg cursor-pointer transition-all duration-300 hover:bg-gray-700 option-label">
                                 <input type="radio" name="question_{{ $question->id }}" value="d" class="hidden">
                                 <div class="w-6 h-6 border-2 border-blue-500 rounded-full mr-3 flex items-center justify-center option-radio">
@@ -77,6 +80,7 @@
                                 </div>
                                 <span class="text-gray-300">{{ $question->option_d }}</span>
                             </label>
+                            @endif
                         </div>
                     </div>
 

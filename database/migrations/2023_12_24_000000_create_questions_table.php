@@ -17,9 +17,9 @@ return new class extends Migration
             $table->foreignId('test_id')->constrained('tests')->onDelete('cascade'); // specify 'tests' table explicitly
             $table->text('question_text'); // The actual question
             $table->string('option_a'); // Option A
-            $table->string('option_b'); // Option B
-            $table->string('option_c'); // Option C
-            $table->string('option_d'); // Option D
+            $table->string('option_b')->nullable(); // Option B
+            $table->string('option_c')->nullable(); // Option C
+            $table->string('option_d')->nullable(); // Option D
             // Correct answer (enum to restrict values)
             $table->enum('correct_option', ['a', 'b', 'c', 'd']);
             $table->text('explanation')->nullable(); // Explanation for the correct answer

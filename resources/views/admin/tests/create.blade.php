@@ -113,17 +113,17 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                         <div class="mb-2">
                             <label class="block text-gray-700 text-sm font-bold mb-2">
-                                <input type="radio" name="questions[${index}][correct_answer]" value="2" required>
+                                <input type="radio" name="questions[${index}][correct_answer]" value="2">
                                 <span class="ml-2">Option C</span>
                             </label>
-                            <input type="text" name="questions[${index}][answers][]" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                            <input type="text" name="questions[${index}][answers][]" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                         </div>
                         <div class="mb-2">
                             <label class="block text-gray-700 text-sm font-bold mb-2">
-                                <input type="radio" name="questions[${index}][correct_answer]" value="3" required>
+                                <input type="radio" name="questions[${index}][correct_answer]" value="3">
                                 <span class="ml-2">Option D</span>
                             </label>
-                            <input type="text" name="questions[${index}][answers][]" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                            <input type="text" name="questions[${index}][answers][]" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                         </div>
                     </div>
                 </div>
