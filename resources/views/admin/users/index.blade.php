@@ -55,7 +55,6 @@
                                     @if(auth()->id() !== $user->id)
                                         <form action="{{ route('admin.users.toggle-block', $user) }}" method="POST" class="inline">
                                             @csrf
-                                            @method('PUT')
                                             <button type="submit" class="text-{{ $user->is_active ? 'red' : 'green' }}-600 hover:text-{{ $user->is_active ? 'red' : 'green' }}-900">
                                                 {{ $user->is_active ? 'Block' : 'Activate' }}
                                             </button>

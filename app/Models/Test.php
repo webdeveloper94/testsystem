@@ -3,41 +3,24 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Models\QuestionImage;
-use App\Models\TestResult;
-use App\Models\Question;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Test extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'title',
         'description',
-        'questions',
         'time_limit',
-        'is_active',
-        'questions_per_test'
+        'passing_score'
     ];
 
-    protected $casts = [
-        'questions' => 'array',
-        'is_active' => 'boolean'
-    ];
-
-    public function images()
-    {
-        return $this->hasMany(QuestionImage::class);
-    }
-
-    public function results()
-    {
-        return $this->hasMany(TestResult::class);
-    }
-
-    public function questions()
+    public function questions(): HasMany
     {
         return $this->hasMany(Question::class);
+    }
+
+    public function results(): HasMany
+    {
+        return $this->hasMany(TestResult::class);
     }
 }

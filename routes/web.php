@@ -1,12 +1,11 @@
 <?php
 
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\ResultController;
-use App\Http\Controllers\Admin\TestController;
-use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ProfileController;
-use App\Models\Test;
-use App\Models\User;
+use App\Http\Controllers\TestController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\ResultController;
+use App\Http\Controllers\Admin\TestController as AdminTestController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,113 +18,55 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-
-
-Route::get('/tests.index', [TestController::class, 'index'])->name('tests.index');
-
-
-Route::get('/tests', [TestController::class, 'results'])->name('tests.results');
-
-
-Route::get('/dashboard', function () {
-    if (auth()->check() && auth()->user()->is_admin == 1) {
-        return redirect('/admin/dashboard');
-    }
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
 Route::middleware('auth')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', function () {
+        if (auth()->user()->is_admin == 1) {
+            return app(DashboardController::class)->index();
+        }
+        return view('dashboard');
+    })->name('dashboard');
+
+    // Profile routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
 
-// Admin routes
-Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
-    Route::get('/dashboard', function() {
-        if (auth()->user()->is_admin != 1) {
-            return redirect('/dashboard');
-        }
-        return app(DashboardController::class)->index();
-    })->name('dashboard');
-    
-    // Tests routes
-    Route::controller(TestController::class)->group(function () {
-        Route::get('/tests', function() {
-            if (auth()->user()->is_admin != 1) return redirect('/dashboard');
-            return app(TestController::class)->index();
-        })->name('tests.index');
-        
-        Route::get('/tests/create', function() {
-            if (auth()->user()->is_admin != 1) return redirect('/dashboard');
-            return app(TestController::class)->create();
-        })->name('tests.create');
-        
-        Route::post('/tests', function() {
-            if (auth()->user()->is_admin != 1) return redirect('/dashboard');
-            return app(TestController::class)->store(request());
-        })->name('tests.store');
-        
-        Route::get('/tests/{test}/edit', function(Test $test) {
-            if (auth()->user()->is_admin != 1) return redirect('/dashboard');
-            return app(TestController::class)->edit($test);
-        })->name('tests.edit');
-        
-        Route::put('/tests/{test}', function(Test $test) {
-            if (auth()->user()->is_admin != 1) return redirect('/dashboard');
-            return app(TestController::class)->update(request(), $test);
-        })->name('tests.update');
-        
-        Route::delete('/tests/{test}', function(Test $test) {
-            if (auth()->user()->is_admin != 1) return redirect('/dashboard');
-            return app(TestController::class)->destroy($test);
-        })->name('tests.destroy');
-    });
-    
-    // Users routes
-    Route::controller(UserController::class)->group(function () {
-        Route::get('/users', function() {
-            if (auth()->user()->is_admin != 1) return redirect('/dashboard');
-            return app(UserController::class)->index();
-        })->name('users.index');
-        
-        Route::get('/users/create', function() {
-            if (auth()->user()->is_admin != 1) return redirect('/dashboard');
-            return app(UserController::class)->create();
-        })->name('users.create');
-        
-        Route::post('/users', function() {
-            if (auth()->user()->is_admin != 1) return redirect('/dashboard');
-            return app(UserController::class)->store(request());
-        })->name('users.store');
-        
-        Route::get('/users/{user}/edit', function(User $user) {
-            if (auth()->user()->is_admin != 1) return redirect('/dashboard');
-            return app(UserController::class)->edit($user);
-        })->name('users.edit');
-        
-        Route::put('/users/{user}', function(User $user) {
-            if (auth()->user()->is_admin != 1) return redirect('/dashboard');
-            return app(UserController::class)->update(request(), $user);
-        })->name('users.update');
-        
-        Route::delete('/users/{user}', function(User $user) {
-            if (auth()->user()->is_admin != 1) return redirect('/dashboard');
-            return app(UserController::class)->destroy($user);
-        })->name('users.destroy');
-        
-        Route::put('/users/{user}/toggle-block', function(User $user) {
-            if (auth()->user()->is_admin != 1) return redirect('/dashboard');
-            return app(UserController::class)->toggleBlock($user);
-        })->name('users.toggle-block');
-    });
-    
-    // Results routes
-    Route::controller(ResultController::class)->group(function () {
-        Route::get('/results', function() {
-            if (auth()->user()->is_admin != 1) return redirect('/dashboard');
-            return app(ResultController::class)->index();
-        })->name('results.index');
+    // Test routes
+    Route::get('/tests', [TestController::class, 'index'])->name('tests.index');
+    Route::get('/tests/{test}', [TestController::class, 'show'])->name('tests.show');
+    Route::post('/tests/check-answer', [TestController::class, 'checkAnswer'])->name('tests.check-answer');
+    Route::post('/tests/{test}/submit', [TestController::class, 'submit'])->name('tests.submit');
+    Route::get('/test-results', [TestController::class, 'results'])->name('tests.results');
+
+    // Admin routes
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('/dashboard', function() {
+            if (!auth()->user()->is_admin) {
+                return redirect('/dashboard');
+            }
+            return app(DashboardController::class)->index();
+        })->name('dashboard');
+
+        // Admin Test routes
+        Route::get('/tests', [AdminTestController::class, 'index'])->name('tests.index');
+        Route::get('/tests/create', [AdminTestController::class, 'create'])->name('tests.create');
+        Route::post('/tests', [AdminTestController::class, 'store'])->name('tests.store');
+        Route::get('/tests/{test}/edit', [AdminTestController::class, 'edit'])->name('tests.edit');
+        Route::put('/tests/{test}', [AdminTestController::class, 'update'])->name('tests.update');
+        Route::delete('/tests/{test}', [AdminTestController::class, 'destroy'])->name('tests.destroy');
+
+        // Admin User routes
+        Route::get('/users', [UserController::class, 'index'])->name('users.index');
+        Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+        Route::post('/users', [UserController::class, 'store'])->name('users.store');
+        Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+        Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+        Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+        Route::post('/users/{user}/toggle-block', [UserController::class, 'toggleBlock'])->name('users.toggle-block');
+
+        // Admin Results routes
+        Route::get('/results', [ResultController::class, 'index'])->name('results.index');
     });
 });
 

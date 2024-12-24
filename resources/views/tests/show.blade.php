@@ -32,6 +32,18 @@
                         <h3 class="text-lg font-semibold text-white mb-4">
                             {{ $question->question_text }}
                         </h3>
+
+                        @php
+                            $questionImage = App\Models\QuestionImage::where('test_id', $test->id)
+                                ->where('question_index', $index)
+                                ->first();
+                        @endphp
+
+                        @if($questionImage)
+                            <div class="mb-4">
+                                <img src="{{ Storage::url($questionImage->image_path) }}" alt="Question Image" class="max-w-full h-auto rounded-lg">
+                            </div>
+                        @endif
                         
                         <div class="space-y-3">
                             <label class="flex items-center p-4 border border-gray-700 rounded-lg cursor-pointer transition-all duration-300 hover:bg-gray-700 option-label">

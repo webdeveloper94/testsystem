@@ -13,14 +13,10 @@ class ResultController extends Controller
      */
     public function index()
     {
-        if (auth()->user()->is_admin != 1) {
-            return redirect('/dashboard');
-        }
-
         $results = TestResult::with(['user', 'test'])
             ->latest()
             ->paginate(10);
-
+            
         return view('admin.results.index', compact('results'));
     }
 

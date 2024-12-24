@@ -3,26 +3,48 @@
 namespace App\Http\Controllers;
 
 use App\Models\Test;
-use App\Models\TestResult;
 use App\Models\Question;
+use App\Models\TestResult;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class TestController extends Controller
 {
     public function index()
     {
-        $tests = Test::where('is_active', true)->get();
-        return view('tests.index', compact('tests'));
+        try {
+            Log::info('Accessing tests index');
+            $tests = Test::all();
+            Log::info('Tests retrieved', ['count' => $tests->count()]);
+            
+            return view('tests.index', [
+                'tests' => $tests
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in tests index', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return back()->with('error', 'Error loading tests');
+        }
     }
 
     public function show(Test $test)
     {
-        $questions = $test->questions()
-            ->inRandomOrder()
-            ->take($test->questions_per_test)
-            ->get();
+        try {
+            $questions = $test->questions()
+                ->inRandomOrder()
+                ->take($test->questions_per_test)
+                ->get();
 
-        return view('tests.show', compact('test', 'questions'));
+            return view('tests.show', compact('test', 'questions'));
+        } catch (\Exception $e) {
+            Log::error('Error showing test', [
+                'test_id' => $test->id,
+                'error' => $e->getMessage()
+            ]);
+            return back()->with('error', 'Error loading test');
+        }
     }
 
     public function checkAnswer(Request $request)
@@ -43,7 +65,7 @@ class TestController extends Controller
     public function submit(Request $request, Test $test)
     {
         try {
-            \Log::info('Test submission started', [
+            Log::info('Test submission started', [
                 'test_id' => $test->id,
                 'user_id' => auth()->id(),
                 'request_data' => $request->all()
@@ -52,9 +74,8 @@ class TestController extends Controller
             $answers = $request->input('answers');
             $timeTaken = $request->input('time_taken');
             
-            // Validate input
             if (empty($answers) || !is_array($answers)) {
-                \Log::error('Invalid answers format', [
+                Log::error('Invalid answers format', [
                     'answers' => $answers,
                     'type' => gettype($answers)
                 ]);
@@ -62,21 +83,16 @@ class TestController extends Controller
             }
             
             if (!$timeTaken || !is_numeric($timeTaken)) {
-                \Log::error('Invalid time_taken format', [
+                Log::error('Invalid time_taken format', [
                     'time_taken' => $timeTaken,
                     'type' => gettype($timeTaken)
                 ]);
                 return response()->json(['error' => 'Invalid time taken format'], 400);
             }
             
-            // Format answers for storage
             $formattedAnswers = [];
-            foreach ($answers as $answer) {
-                if (!isset($answer['question_id']) || !isset($answer['selected_option'])) {
-                    \Log::error('Invalid answer format', ['answer' => $answer]);
-                    return response()->json(['error' => 'Invalid answer format'], 400);
-                }
-                $formattedAnswers[$answer['question_id']] = $answer['selected_option'];
+            foreach ($answers as $questionId => $selectedOption) {
+                $formattedAnswers[$questionId] = $selectedOption;
             }
             
             // Calculate score
@@ -92,7 +108,6 @@ class TestController extends Controller
             
             $score = ($correctAnswers / $totalQuestions) * 100;
             
-            // Save test result
             $result = TestResult::create([
                 'user_id' => auth()->id(),
                 'test_id' => $test->id,
@@ -101,12 +116,9 @@ class TestController extends Controller
                 'time_taken' => $timeTaken
             ]);
             
-            \Log::info('Test result saved successfully', [
-                'test_id' => $test->id,
-                'user_id' => auth()->id(),
-                'score' => $score,
+            Log::info('Test result saved', [
                 'result_id' => $result->id,
-                'answers' => $formattedAnswers
+                'score' => $score
             ]);
             
             return response()->json([
@@ -117,12 +129,9 @@ class TestController extends Controller
             ]);
             
         } catch (\Exception $e) {
-            \Log::error('Error saving test result', [
+            Log::error('Error saving test result', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'test_id' => $test->id,
-                'user_id' => auth()->id(),
-                'request_data' => $request->all()
+                'trace' => $e->getTraceAsString()
             ]);
             
             return response()->json(['error' => 'An error occurred while saving the test result'], 500);
@@ -131,11 +140,18 @@ class TestController extends Controller
 
     public function results()
     {
-        $results = TestResult::with('test')
-            ->where('user_id', auth()->id())
-            ->orderBy('created_at', 'desc')
-            ->get();
-            
-        return view('tests.results', compact('results'));
+        try {
+            $results = TestResult::with('test')
+                ->where('user_id', auth()->id())
+                ->latest()
+                ->get();
+                
+            return view('tests.results', compact('results'));
+        } catch (\Exception $e) {
+            Log::error('Error showing results', [
+                'error' => $e->getMessage()
+            ]);
+            return back()->with('error', 'Error loading test results');
+        }
     }
 }

@@ -15,7 +15,7 @@ class UserController extends Controller
             return redirect('/dashboard');
         }
 
-        $users = User::all();
+        $users = User::where('is_admin', false)->latest()->get();
         return view('admin.users.index', compact('users'));
     }
 
@@ -38,19 +38,17 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'is_admin' => 'boolean'
         ]);
 
         User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'is_admin' => $validated['is_admin'] ?? false,
             'is_active' => true
         ]);
 
         return redirect()->route('admin.users.index')
-            ->with('success', 'User created successfully');
+            ->with('success', 'User created successfully.');
     }
 
     public function edit(User $user)
@@ -72,25 +70,19 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:8|confirmed',
-            'is_admin' => 'boolean',
-            'is_active' => 'boolean'
         ]);
 
-        $userData = [
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'is_admin' => $request->has('is_admin'),
-            'is_active' => $request->has('is_active')
-        ];
-
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
+        
         if (!empty($validated['password'])) {
-            $userData['password'] = Hash::make($validated['password']);
+            $user->password = Hash::make($validated['password']);
         }
 
-        $user->update($userData);
+        $user->save();
 
         return redirect()->route('admin.users.index')
-            ->with('success', 'User updated successfully');
+            ->with('success', 'User updated successfully.');
     }
 
     public function destroy(User $user)
@@ -107,7 +99,7 @@ class UserController extends Controller
         $user->delete();
 
         return redirect()->route('admin.users.index')
-            ->with('success', 'User deleted successfully');
+            ->with('success', 'User deleted successfully.');
     }
 
     public function toggleBlock(User $user)

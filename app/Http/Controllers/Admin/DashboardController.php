@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Test;
 use App\Models\User;
 use App\Models\TestResult;
@@ -12,6 +11,10 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        if (auth()->user()->is_admin != 1) {
+            return redirect('/dashboard');
+        }
+
         $totalTests = Test::count();
         $totalUsers = User::count();
         $totalTestsTaken = TestResult::count();
