@@ -33,10 +33,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Test routes
-    Route::get('/tests', [TestController::class, 'index'])->name('tests.index');
-    Route::get('/tests/{test}', [TestController::class, 'show'])->name('tests.show');
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/tests', [TestController::class, 'index'])->name('tests.index');
+        Route::get('/tests/{test}', [TestController::class, 'show'])->name('tests.show');
+        Route::post('/tests/{test}/submit', [TestController::class, 'submit'])->name('tests.submit');
+        Route::get('/tests/{test}/results/{result}/solution', [TestController::class, 'showSolution'])->name('tests.solution');
+    });
     Route::post('/tests/check-answer', [TestController::class, 'checkAnswer'])->name('tests.check-answer');
-    Route::post('/tests/{test}/submit', [TestController::class, 'submit'])->name('tests.submit');
     Route::get('/test-results', [TestController::class, 'results'])->name('tests.results');
 
     // Admin routes

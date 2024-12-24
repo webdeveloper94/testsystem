@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('question_images', function (Blueprint $table) {
             $table->id();
             $table->foreignId('test_id')->constrained()->onDelete('cascade');
-            $table->integer('question_index'); // savol indeksi
+            $table->foreignId('question_id')->constrained('questions')->onDelete('cascade');
             $table->string('image_path');
             $table->timestamps();
         });

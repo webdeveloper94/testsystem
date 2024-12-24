@@ -15,7 +15,7 @@ class TestSeeder extends Seeder
             'title' => 'Sample Math Test',
             'description' => 'A basic mathematics test covering arithmetic and algebra.',
             'time_limit' => 30,
-            'passing_score' => 70,
+            
         ]);
 
         // Create questions for the test

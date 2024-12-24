@@ -33,52 +33,46 @@
                             {{ $question->question_text }}
                         </h3>
 
-                        @php
-                            $questionImage = App\Models\QuestionImage::where('test_id', $test->id)
-                                ->where('question_index', $index)
-                                ->first();
-                        @endphp
-
-                        @if($questionImage)
+                        @if($question->image)
                             <div class="mb-4">
-                                <img src="{{ Storage::url($questionImage->image_path) }}" alt="Question Image" class="max-w-full h-auto rounded-lg">
+                                <img src="{{ Storage::url($question->image->image_path) }}" alt="Question Image" class="max-w-full h-auto rounded-lg">
                             </div>
                         @endif
                         
                         <div class="space-y-3">
                             <label class="flex items-center p-4 border border-gray-700 rounded-lg cursor-pointer transition-all duration-300 hover:bg-gray-700 option-label">
-                                <input type="radio" name="question_{{ $question->id }}" value="a" class="hidden">
+                                <input type="radio" name="question_{{ $question->id }}" value="a" class="hidden answer-radio" data-question-id="{{ $question->id }}">
                                 <div class="w-6 h-6 border-2 border-blue-500 rounded-full mr-3 flex items-center justify-center option-radio">
                                     <div class="w-3 h-3 rounded-full bg-blue-500 opacity-0 transition-opacity duration-300"></div>
                                 </div>
-                                <span class="text-gray-300">{{ $question->option_a }}</span>
+                                <span class="text-gray-300">{{ $question->options['a'] }}</span>
                             </label>
 
                             <label class="flex items-center p-4 border border-gray-700 rounded-lg cursor-pointer transition-all duration-300 hover:bg-gray-700 option-label">
-                                <input type="radio" name="question_{{ $question->id }}" value="b" class="hidden">
+                                <input type="radio" name="question_{{ $question->id }}" value="b" class="hidden answer-radio" data-question-id="{{ $question->id }}">
                                 <div class="w-6 h-6 border-2 border-blue-500 rounded-full mr-3 flex items-center justify-center option-radio">
                                     <div class="w-3 h-3 rounded-full bg-blue-500 opacity-0 transition-opacity duration-300"></div>
                                 </div>
-                                <span class="text-gray-300">{{ $question->option_b }}</span>
+                                <span class="text-gray-300">{{ $question->options['b'] }}</span>
                             </label>
 
-                            @if($question->option_c)
+                            @if($question->options['c'])
                             <label class="flex items-center p-4 border border-gray-700 rounded-lg cursor-pointer transition-all duration-300 hover:bg-gray-700 option-label">
-                                <input type="radio" name="question_{{ $question->id }}" value="c" class="hidden">
+                                <input type="radio" name="question_{{ $question->id }}" value="c" class="hidden answer-radio" data-question-id="{{ $question->id }}">
                                 <div class="w-6 h-6 border-2 border-blue-500 rounded-full mr-3 flex items-center justify-center option-radio">
                                     <div class="w-3 h-3 rounded-full bg-blue-500 opacity-0 transition-opacity duration-300"></div>
                                 </div>
-                                <span class="text-gray-300">{{ $question->option_c }}</span>
+                                <span class="text-gray-300">{{ $question->options['c'] }}</span>
                             </label>
                             @endif
 
-                            @if($question->option_d)
+                            @if($question->options['d'])
                             <label class="flex items-center p-4 border border-gray-700 rounded-lg cursor-pointer transition-all duration-300 hover:bg-gray-700 option-label">
-                                <input type="radio" name="question_{{ $question->id }}" value="d" class="hidden">
+                                <input type="radio" name="question_{{ $question->id }}" value="d" class="hidden answer-radio" data-question-id="{{ $question->id }}">
                                 <div class="w-6 h-6 border-2 border-blue-500 rounded-full mr-3 flex items-center justify-center option-radio">
                                     <div class="w-3 h-3 rounded-full bg-blue-500 opacity-0 transition-opacity duration-300"></div>
                                 </div>
-                                <span class="text-gray-300">{{ $question->option_d }}</span>
+                                <span class="text-gray-300">{{ $question->options['d'] }}</span>
                             </label>
                             @endif
                         </div>
@@ -206,12 +200,10 @@ document.addEventListener('DOMContentLoaded', function() {
     let startTime = new Date();
 
     // Add event listeners for radio buttons
-    document.querySelectorAll('input[type="radio"]').forEach(radio => {
+    document.querySelectorAll('.answer-radio').forEach(radio => {
         radio.addEventListener('change', function() {
-            const questionId = this.closest('.question-slide').dataset.questionId;
+            const questionId = this.getAttribute('data-question-id');
             answers[questionId] = this.value;
-            console.log('Answer selected:', { questionId, value: this.value });
-            console.log('Current answers:', answers);
             
             // Update the selected state of the parent label
             const labels = this.closest('.question-slide').querySelectorAll('.option-label');
@@ -235,46 +227,42 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, 1000);
 
-    // Function to show a specific question
-    function showQuestion(index) {
-        questions.forEach((q, i) => {
-            if (i === index) {
-                q.classList.remove('hidden');
-            } else {
-                q.classList.add('hidden');
-            }
-        });
-        
-        currentQuestionIndex = index;
-        document.getElementById('questionCounter').textContent = index + 1;
-        document.getElementById('progressBar').style.width = 
-            `${((index + 1) / totalQuestions) * 100}%`;
-    }
-
     // Check Answer button click handler
     document.querySelectorAll('.check-answer-btn').forEach(btn => {
         btn.addEventListener('click', async function() {
             const currentSlide = questions[currentQuestionIndex];
-            const questionId = currentSlide.dataset.questionId;
             const selectedOption = currentSlide.querySelector('input[type="radio"]:checked');
             
             if (!selectedOption) {
                 alert('Please select an answer before checking.');
                 return;
             }
+
+            const questionId = selectedOption.getAttribute('data-question-id');
             
             try {
+                const token = document.querySelector('meta[name="csrf-token"]');
+                if (!token) {
+                    throw new Error('CSRF token not found');
+                }
+
                 const response = await fetch('{{ route("tests.check-answer") }}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': token.getAttribute('content')
                     },
                     body: JSON.stringify({
                         question_id: questionId,
                         selected_option: selectedOption.value
                     })
                 });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+                }
                 
                 const result = await response.json();
                 
@@ -285,13 +273,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 const feedbackText = feedbackArea.querySelector('.feedback-text');
                 
                 feedbackArea.classList.remove('hidden');
+                correctIcon.classList.add('hidden');
+                incorrectIcon.classList.add('hidden');
+                
                 if (result.correct) {
                     correctIcon.classList.remove('hidden');
-                    incorrectIcon.classList.add('hidden');
                     feedbackText.textContent = 'Correct!';
                     selectedOption.closest('.option-label').classList.add('correct');
                 } else {
-                    correctIcon.classList.add('hidden');
                     incorrectIcon.classList.remove('hidden');
                     feedbackText.textContent = 'Incorrect. The correct answer is: ' + 
                         result.correctOption.toUpperCase();
@@ -313,47 +302,27 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Next button click handler
-    document.querySelectorAll('.next-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            if (currentQuestionIndex < totalQuestions - 1) {
-                showQuestion(currentQuestionIndex + 1);
-            }
-        });
+    // Submit test handler
+    document.querySelectorAll('.submit-test-btn').forEach(btn => {
+        btn.addEventListener('click', submitTest);
     });
 
-    // Previous button click handler
-    document.querySelectorAll('.prev-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            if (currentQuestionIndex > 0) {
-                showQuestion(currentQuestionIndex - 1);
-            }
-        });
-    });
-
-    // Submit test
     async function submitTest() {
-        const timeTaken = Math.floor((new Date() - startTime) / 1000);
-        
         try {
-            // Validate answers
-            if (Object.keys(answers).length === 0) {
-                alert('Please answer at least one question before submitting.');
-                return;
-            }
-            
-            console.log('Submitting test with answers:', answers);
-            console.log('Time taken:', timeTaken);
-            
+            const timeTaken = Math.round((new Date() - startTime) / 1000);
+            console.log('Submitting test with answers: ', answers);
+            console.log('Time taken: ', timeTaken);
+
             const token = document.querySelector('meta[name="csrf-token"]');
             if (!token) {
                 throw new Error('CSRF token not found');
             }
-            
-            const response = await fetch(`{{ route('tests.submit', $test) }}`, {
+
+            const response = await fetch('{{ route("tests.submit", ["test" => $test->id]) }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json',
                     'X-CSRF-TOKEN': token.getAttribute('content')
                 },
                 body: JSON.stringify({
@@ -363,55 +332,69 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             if (!response.ok) {
-                const errorText = await response.text();
-                console.error('Response not ok:', response.status, errorText);
-                throw new Error(`Network response was not ok: ${response.status}`);
+                const errorData = await response.json();
+                throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
             }
 
             const result = await response.json();
-            console.log('Test submission result:', result);
-            
-            if (result.error) {
-                throw new Error(result.error);
-            }
-            
+            console.log('Test submission result: ', result);
+
             // Show result modal
-            const modal = document.getElementById('resultModal');
-            const scoreElement = document.getElementById('finalScore');
-            const correctAnswersElement = document.getElementById('correctAnswers');
-            const timeTakenElement = document.getElementById('timeTaken');
+            const resultModal = document.getElementById('resultModal');
             const resultIcon = document.getElementById('resultIcon');
-            
-            if (!modal || !scoreElement || !correctAnswersElement || !timeTakenElement || !resultIcon) {
-                throw new Error('Required modal elements not found');
-            }
-            
-            scoreElement.textContent = `${result.score.toFixed(1)}%`;
-            correctAnswersElement.textContent = `${result.correctAnswers}/${result.totalQuestions}`;
-            
-            const minutes = Math.floor(result.timeTaken / 60);
-            const seconds = result.timeTaken % 60;
-            timeTakenElement.textContent = `${minutes}m ${seconds}s`;
-            
+            const finalScore = document.getElementById('finalScore');
+            const correctAnswers = document.getElementById('correctAnswers');
+            const timeTakenElement = document.getElementById('timeTaken');
+
+            finalScore.textContent = `${Math.round(result.score)}%`;
+            correctAnswers.textContent = `${result.correctAnswers} / ${result.totalQuestions}`;
+            timeTakenElement.textContent = `${Math.floor(result.timeTaken / 60)}m ${result.timeTaken % 60}s`;
+
             if (result.score >= 70) {
                 resultIcon.className = 'fas fa-trophy text-yellow-500';
+            } else if (result.score >= 50) {
+                resultIcon.className = 'fas fa-medal text-gray-400';
             } else {
-                resultIcon.className = 'fas fa-star text-blue-500';
+                resultIcon.className = 'fas fa-times-circle text-red-500';
             }
-            
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            
+
+            resultModal.classList.remove('hidden');
+            resultModal.classList.add('flex');
+
             // Clear timer
             clearInterval(timer);
+
         } catch (error) {
             console.error('Error submitting test:', error);
             alert('An error occurred while submitting the test. Please try again.');
         }
     }
 
-    document.querySelectorAll('.submit-test-btn').forEach(btn => {
-        btn.addEventListener('click', submitTest);
+    // Next and Previous button handlers
+    document.querySelectorAll('.next-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (currentQuestionIndex < totalQuestions - 1) {
+                questions[currentQuestionIndex].classList.add('hidden');
+                currentQuestionIndex++;
+                questions[currentQuestionIndex].classList.remove('hidden');
+                document.getElementById('questionCounter').textContent = currentQuestionIndex + 1;
+                document.getElementById('progressBar').style.width = 
+                    `${((currentQuestionIndex + 1) / totalQuestions) * 100}%`;
+            }
+        });
+    });
+
+    document.querySelectorAll('.prev-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                questions[currentQuestionIndex].classList.add('hidden');
+                currentQuestionIndex--;
+                questions[currentQuestionIndex].classList.remove('hidden');
+                document.getElementById('questionCounter').textContent = currentQuestionIndex + 1;
+                document.getElementById('progressBar').style.width = 
+                    `${((currentQuestionIndex + 1) / totalQuestions) * 100}%`;
+            }
+        });
     });
 });
 </script>

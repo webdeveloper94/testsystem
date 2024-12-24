@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\QuestionImage;
 
 class Question extends Model
 {
@@ -17,8 +18,7 @@ class Question extends Model
         'option_c',
         'option_d',
         'correct_option',
-        'explanation',
-        'points'
+        'explanation'
     ];
 
     public function test()
@@ -29,5 +29,10 @@ class Question extends Model
     public function image()
     {
         return $this->hasOne(QuestionImage::class);
+    }
+
+    public function getImage()
+    {
+        return QuestionImage::where('question_id', $this->id)->first();
     }
 }

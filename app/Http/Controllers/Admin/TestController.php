@@ -39,6 +39,7 @@ class TestController extends Controller
             'description' => 'required|string',
             'time_limit' => 'required|integer|min:1',
             'questions_per_test' => 'required|integer|min:1',
+            'passing_score' => 'nullable|integer',
             'questions' => 'required|array|min:1',
             'questions.*.text' => 'required|string',
             'questions.*.correct_answer' => 'required|integer|min:0|max:3',
@@ -58,32 +59,20 @@ class TestController extends Controller
                 'title' => $validated['title'],
                 'description' => $validated['description'],
                 'time_limit' => $validated['time_limit'],
-                'questions_per_test' => $validated['questions_per_test'],
-                'is_active' => $request->has('is_active')
+                'passing_score' => $validated['passing_score'] ?? null,
+                'questions_per_test' => $validated['questions_per_test'] ?? null,
+                'is_active' => true
             ]);
 
             // Create questions
             foreach ($validated['questions'] as $index => $questionData) {
-                // Handle image upload
-                if ($request->hasFile("questions.{$index}.image")) {
-                    $image = $request->file("questions.{$index}.image");
-                    $imagePath = $image->store('question_images', 'public');
-                    
-                    // Create question image
-                    QuestionImage::create([
-                        'test_id' => $test->id,
-                        'question_index' => $index,
-                        'image_path' => $imagePath
-                    ]);
-                }
-
                 // Convert numeric correct answer (0-3) to letter (a-d)
                 $correctOption = chr(97 + $questionData['correct_answer']); // 0->a, 1->b, 2->c, 3->d
 
                 // Get answers array
                 $answers = $questionData['answers'];
 
-                // Create question with options
+                // Create question first
                 $question = $test->questions()->create([
                     'question_text' => $questionData['text'],
                     'option_a' => $answers[0],
@@ -92,6 +81,19 @@ class TestController extends Controller
                     'option_d' => isset($answers[3]) ? $answers[3] : null,
                     'correct_option' => $correctOption
                 ]);
+
+                // Handle image upload
+                if ($request->hasFile("questions.{$index}.image")) {
+                    $image = $request->file("questions.{$index}.image");
+                    $imagePath = $image->store('question_images', 'public');
+                    
+                    // Create question image with question_id
+                    QuestionImage::create([
+                        'test_id' => $test->id,
+                        'question_id' => $question->id,
+                        'image_path' => $imagePath
+                    ]);
+                }
             }
 
             DB::commit();
