@@ -3,7 +3,7 @@
 @section('content')
 <div class="py-12 bg-gray-100">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-8 text-center">Test Results</h1>
+        <h1 class="text-3xl font-bold text-gray-900 mb-8 text-center">Test natijalari</h1>
         
         <div class="bg-white overflow-hidden shadow-lg rounded-lg">
             <div class="p-6">
@@ -12,12 +12,12 @@
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead>
                                 <tr class="bg-gray-50">
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Test</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Score</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time Taken</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Solution</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Test nomi</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ball</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sarflangan vaqt</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sana</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Holat</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Yechim</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
@@ -55,11 +55,11 @@
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         @if($result->score >= 70)
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                                Passed
+                                                O'tdi
                                             </span>
                                         @else
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                                Failed
+                                                O'tmadi
                                             </span>
                                         @endif
                                     </td>
@@ -67,7 +67,7 @@
                                         <a href="{{ route('tests.solution', ['test' => $result->test->id, 'result' => $result->id]) }}" 
                                            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors">
                                             <i class="fas fa-eye mr-2"></i>
-                                            View Solution
+                                            Yechimni ko'rish
                                         </a>
                                     </td>
                                 </tr>
@@ -79,54 +79,31 @@
                     <!-- Stats Cards -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
                         <div class="bg-blue-50 rounded-lg p-6">
-                            <div class="flex items-center">
-                                <div class="p-3 rounded-full bg-blue-500 text-white mr-4">
-                                    <i class="fas fa-chart-line"></i>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-600">Average Score</p>
-                                    <p class="text-xl font-semibold text-gray-800">
-                                        {{ number_format($results->avg('score'), 1) }}%
-                                    </p>
-                                </div>
-                            </div>
+                            <h4 class="text-blue-600 font-semibold mb-2">O'rtacha ball</h4>
+                            <p class="text-3xl font-bold text-blue-800">
+                                {{ number_format($results->avg('score'), 1) }}%
+                            </p>
                         </div>
-
                         <div class="bg-green-50 rounded-lg p-6">
-                            <div class="flex items-center">
-                                <div class="p-3 rounded-full bg-green-500 text-white mr-4">
-                                    <i class="fas fa-check-circle"></i>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-600">Tests Passed</p>
-                                    <p class="text-xl font-semibold text-gray-800">
-                                        {{ $results->where('score', '>=', 70)->count() }}
-                                    </p>
-                                </div>
-                            </div>
+                            <h4 class="text-green-600 font-semibold mb-2">O'tgan testlar</h4>
+                            <p class="text-3xl font-bold text-green-800">
+                                {{ $results->where('score', '>=', 70)->count() }}
+                            </p>
                         </div>
-
-                        <div class="bg-yellow-50 rounded-lg p-6">
-                            <div class="flex items-center">
-                                <div class="p-3 rounded-full bg-yellow-500 text-white mr-4">
-                                    <i class="fas fa-stopwatch"></i>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-600">Total Time Spent</p>
-                                    <p class="text-xl font-semibold text-gray-800">
-                                        {{ floor($results->sum('time_taken') / 60) }}m
-                                    </p>
-                                </div>
-                            </div>
+                        <div class="bg-purple-50 rounded-lg p-6">
+                            <h4 class="text-purple-600 font-semibold mb-2">Jami testlar</h4>
+                            <p class="text-3xl font-bold text-purple-800">
+                                {{ $results->count() }}
+                            </p>
                         </div>
                     </div>
                 @else
                     <div class="text-center py-12">
                         <i class="fas fa-clipboard-list text-5xl text-gray-300 mb-4"></i>
-                        <p class="text-gray-500">You haven't taken any tests yet.</p>
+                        <p class="text-gray-500">Siz hali birorta test topshirmadingiz.</p>
                         <a href="{{ route('tests.index') }}" class="mt-4 inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition duration-300">
-                            <i class="fas fa-play-circle mr-2"></i>
-                            Start a Test
+                            <i class="fas fa-clipboard-list mr-2"></i>
+                            Testlarni ko'rish
                         </a>
                     </div>
                 @endif

@@ -5,7 +5,7 @@
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white overflow-hidden shadow-lg rounded-lg">
             <div class="p-6">
-                <h2 class="text-2xl font-semibold text-gray-800 mb-6">Welcome, {{ Auth::user()->name }}!</h2>
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6">Xush kelibsiz, {{ Auth::user()->name }}!</h2>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <!-- Available Tests Card -->
@@ -14,11 +14,11 @@
                             <div class="p-3 bg-blue-100 rounded-full">
                                 <i class="fas fa-clipboard-list text-blue-500 text-xl"></i>
                             </div>
-                            <h3 class="ml-4 text-lg font-semibold text-gray-700">Available Tests</h3>
+                            <h3 class="ml-4 text-lg font-semibold text-gray-700">Mavjud testlar</h3>
                         </div>
-                        <p class="text-gray-600 mb-4">Start a new test or continue where you left off.</p>
+                        <p class="text-gray-600 mb-4">Yangi testni boshlang yoki davom ettiring.</p>
                         <a href="{{ route('tests.index') }}" class="inline-flex items-center text-blue-500 hover:text-blue-600">
-                            View Tests
+                            Testlarni ko'rish
                             <i class="fas fa-arrow-right ml-2"></i>
                         </a>
                     </div>
@@ -29,11 +29,11 @@
                             <div class="p-3 bg-green-100 rounded-full">
                                 <i class="fas fa-chart-line text-green-500 text-xl"></i>
                             </div>
-                            <h3 class="ml-4 text-lg font-semibold text-gray-700">Your Results</h3>
+                            <h3 class="ml-4 text-lg font-semibold text-gray-700">Natijalaringiz</h3>
                         </div>
-                        <p class="text-gray-600 mb-4">View your test history and performance analytics.</p>
+                        <p class="text-gray-600 mb-4">Test tarixi va natijalarini ko'ring.</p>
                         <a href="{{ route('tests.results') }}" class="inline-flex items-center text-green-500 hover:text-green-600">
-                            View Results
+                            Natijalarni ko'rish
                             <i class="fas fa-arrow-right ml-2"></i>
                         </a>
                     </div>
@@ -44,11 +44,11 @@
                             <div class="p-3 bg-purple-100 rounded-full">
                                 <i class="fas fa-user text-purple-500 text-xl"></i>
                             </div>
-                            <h3 class="ml-4 text-lg font-semibold text-gray-700">Your Profile</h3>
+                            <h3 class="ml-4 text-lg font-semibold text-gray-700">Profil</h3>
                         </div>
-                        <p class="text-gray-600 mb-4">Update your personal information and preferences.</p>
+                        <p class="text-gray-600 mb-4">Profilingizni sozlang va yangilang.</p>
                         <a href="{{ route('profile.edit') }}" class="inline-flex items-center text-purple-500 hover:text-purple-600">
-                            Edit Profile
+                            Profilni tahrirlash
                             <i class="fas fa-arrow-right ml-2"></i>
                         </a>
                     </div>
@@ -56,14 +56,14 @@
 
                 @if($latestResults ?? null)
                 <div class="mt-8">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Recent Activity</h3>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">So'nggi faoliyat</h3>
                     <div class="bg-white rounded-lg shadow overflow-hidden">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Test</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Score</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Test nomi</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ball</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sana</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200">

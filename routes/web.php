@@ -24,7 +24,10 @@ Route::middleware('auth')->group(function () {
         if (auth()->user()->is_admin == 1) {
             return app(DashboardController::class)->index();
         }
+        if(auth()->user()->is_admin != 1 && auth()->user()->is_active == 1){
         return view('dashboard');
+        }
+        return view('block');
     })->name('dashboard');
 
     // Profile routes

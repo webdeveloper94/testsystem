@@ -10,11 +10,11 @@
                 <div class="flex items-center text-sm">
                     <div class="mr-4">
                         <i class="far fa-clock mr-1"></i>
-                        Time Remaining: <span id="timer" class="font-semibold">{{ $test->time_limit }}:00</span>
+                        Qolgan vaqt: <span id="timer" class="font-semibold">{{ $test->time_limit }}:00</span>
                     </div>
                     <div>
                         <i class="far fa-question-circle mr-1"></i>
-                        Questions: <span id="questionCounter" class="font-semibold">1</span>/{{ count($questions) }}
+                        Savollar: <span id="questionCounter" class="font-semibold">1</span>/{{ count($questions) }}
                     </div>
                 </div>
             </div>
@@ -56,17 +56,17 @@
                                 <span class="text-gray-300">{{ $question->options['b'] }}</span>
                             </label>
 
-                            @if($question->options['c'])
-                            <label class="flex items-center p-4 border border-gray-700 rounded-lg cursor-pointer transition-all duration-300 hover:bg-gray-700 option-label">
-                                <input type="radio" name="question_{{ $question->id }}" value="c" class="hidden answer-radio" data-question-id="{{ $question->id }}">
-                                <div class="w-6 h-6 border-2 border-blue-500 rounded-full mr-3 flex items-center justify-center option-radio">
-                                    <div class="w-3 h-3 rounded-full bg-blue-500 opacity-0 transition-opacity duration-300"></div>
-                                </div>
-                                <span class="text-gray-300">{{ $question->options['c'] }}</span>
-                            </label>
-                            @endif
+                            @if(isset($question->options['c']) && !is_null($question->options['c']))
+    <label class="flex items-center p-4 border border-gray-700 rounded-lg cursor-pointer transition-all duration-300 hover:bg-gray-700 option-label">
+        <input type="radio" name="question_{{ $question->id }}" value="c" class="hidden answer-radio" data-question-id="{{ $question->id }}">
+        <div class="w-6 h-6 border-2 border-blue-500 rounded-full mr-3 flex items-center justify-center option-radio">
+            <div class="w-3 h-3 rounded-full bg-blue-500 opacity-0 transition-opacity duration-300"></div>
+        </div>
+        <span class="text-gray-300">{{ $question->options['c'] }}</span>
+    </label>
+@endif
 
-                            @if($question->options['d'])
+                            @if(isset($question->options['d']) && !is_null($question->options['d']))
                             <label class="flex items-center p-4 border border-gray-700 rounded-lg cursor-pointer transition-all duration-300 hover:bg-gray-700 option-label">
                                 <input type="radio" name="question_{{ $question->id }}" value="d" class="hidden answer-radio" data-question-id="{{ $question->id }}">
                                 <div class="w-6 h-6 border-2 border-blue-500 rounded-full mr-3 flex items-center justify-center option-radio">
@@ -104,18 +104,18 @@
                         
                         <button type="button" class="check-answer-btn px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300 flex items-center">
                             <i class="fas fa-check mr-2"></i>
-                            Check Answer
+                            Tekshirish
                         </button>
                         
                         <button type="button" class="next-btn hidden px-4 py-2 text-blue-400 hover:text-blue-300 flex items-center">
-                            Next
+                            Keyingisi
                             <i class="fas fa-arrow-right ml-2"></i>
                         </button>
                         
                         @if($index === count($questions) - 1)
                         <button type="button" class="submit-test-btn hidden px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-300 flex items-center">
                             <i class="fas fa-flag-checkered mr-2"></i>
-                            Submit Test
+                            Testni yakunlash
                         </button>
                         @endif
                     </div>
@@ -133,20 +133,20 @@
             <div class="mb-4">
                 <i id="resultIcon" class="text-6xl mb-4"></i>
             </div>
-            <h2 class="text-2xl font-bold text-white mb-4">Test Complete!</h2>
+            <h2 class="text-2xl font-bold text-white mb-4">Test Yakunlandi!</h2>
             <div class="space-y-2 mb-6">
-                <p class="text-gray-300">Score: <span id="finalScore" class="font-bold text-white"></span></p>
-                <p class="text-gray-300">Correct Answers: <span id="correctAnswers" class="font-bold text-white"></span></p>
-                <p class="text-gray-300">Time Taken: <span id="timeTaken" class="font-bold text-white"></span></p>
+                <p class="text-gray-300">Ball: <span id="finalScore" class="font-bold text-white"></span></p>
+                <p class="text-gray-300">To'g'ri javoblar: <span id="correctAnswers" class="font-bold text-white"></span></p>
+                <p class="text-gray-300">Vaqt: <span id="timeTaken" class="font-bold text-white"></span></p>
             </div>
             <div class="flex justify-center space-x-4">
                 <a href="{{ route('tests.index') }}" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300">
                     <i class="fas fa-list mr-2"></i>
-                    All Tests
+                    Testlar
                 </a>
                 <a href="{{ route('tests.results') }}" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-300">
                     <i class="fas fa-chart-bar mr-2"></i>
-                    View Results
+                    Natijani ko'rish
                 </a>
             </div>
         </div>
@@ -278,11 +278,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 if (result.correct) {
                     correctIcon.classList.remove('hidden');
-                    feedbackText.textContent = 'Correct!';
+                    feedbackText.textContent = 'To\'g\'ri';
                     selectedOption.closest('.option-label').classList.add('correct');
                 } else {
                     incorrectIcon.classList.remove('hidden');
-                    feedbackText.textContent = 'Incorrect. The correct answer is: ' + 
+                    feedbackText.textContent = 'Xato, to\'g\'ri javob: ' + 
                         result.correctOption.toUpperCase();
                     selectedOption.closest('.option-label').classList.add('incorrect');
                 }

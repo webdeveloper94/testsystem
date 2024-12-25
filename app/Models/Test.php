@@ -15,6 +15,7 @@ class Test extends Model
         'description',
         'time_limit',
         'passing_score',
+        'passing_score',
         'is_active',
         'questions_per_test'
     ];

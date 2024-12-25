@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ config('app.name', '') }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -110,19 +110,19 @@
                             <a href="{{ route('dashboard') }}" 
                                class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }} text-white px-3 py-2 rounded-md text-sm font-medium hover:text-blue-200 flex items-center space-x-2">
                                 <i class="fas fa-home"></i>
-                                <span>{{ __('Dashboard') }}</span>
+                                <span>{{ __('Bosh sahifa') }}</span>
                             </a>
                             
                             <a href="{{ route('tests.index') }}"
                                class="nav-item {{ request()->routeIs('tests.*') ? 'active' : '' }} text-white px-3 py-2 rounded-md text-sm font-medium hover:text-blue-200 flex items-center space-x-2">
                                 <i class="fas fa-clipboard-list"></i>
-                                <span>{{ __('Tests') }}</span>
+                                <span>{{ __('Testlar') }}</span>
                             </a>
                             
                             <a href="{{ route('tests.results') }}"
                                class="nav-item {{ request()->routeIs('tests.results') ? 'active' : '' }} text-white px-3 py-2 rounded-md text-sm font-medium hover:text-blue-200 flex items-center space-x-2">
                                 <i class="fas fa-chart-bar"></i>
-                                <span>{{ __('Results') }}</span>
+                                <span>{{ __('Natijalar') }}</span>
                             </a>
                         </div>
                     </div>
