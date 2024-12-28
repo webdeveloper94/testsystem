@@ -31,70 +31,73 @@ const submit = () => {
 
 <template>
     <GuestLayout>
-        <Head title="Log in" />
+        <Head title="Kirish" />
 
-        <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
+        <!-- Status Message -->
+        <div v-if="status" class="mb-4 text-sm font-medium text-green-600 transition-all duration-500 ease-in-out">
             {{ status }}
         </div>
 
-        <form @submit.prevent="submit">
-            <div>
-                <InputLabel for="email" value="Email" />
+        <!-- Login Form -->
+        <form @submit.prevent="submit" class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-lg shadow-blue-500/30 mt-8 transition-all duration-500 ease-in-out transform hover:scale-105">
+            <div class="space-y-4">
+                <!-- Email Input -->
+                <div>
+                    <InputLabel for="email" value="Elektron pochta" />
+                    <TextInput
+                        id="email"
+                        type="email"
+                        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300 ease-in-out"
+                        v-model="form.email"
+                        required
+                        autofocus
+                        autocomplete="username"
+                    />
+                    <InputError class="mt-2" :message="form.errors.email" />
+                </div>
 
-                <TextInput
-                    id="email"
-                    type="email"
-                    class="mt-1 block w-full"
-                    v-model="form.email"
-                    required
-                    autofocus
-                    autocomplete="username"
-                />
+                <!-- Password Input -->
+                <div>
+                    <InputLabel for="password" value="Parol" />
+                    <TextInput
+                        id="password"
+                        type="password"
+                        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300 ease-in-out"
+                        v-model="form.password"
+                        required
+                        autocomplete="current-password"
+                    />
+                    <InputError class="mt-2" :message="form.errors.password" />
+                </div>
 
-                <InputError class="mt-2" :message="form.errors.email" />
-            </div>
-
-            <div class="mt-4">
-                <InputLabel for="password" value="Password" />
-
-                <TextInput
-                    id="password"
-                    type="password"
-                    class="mt-1 block w-full"
-                    v-model="form.password"
-                    required
-                    autocomplete="current-password"
-                />
-
-                <InputError class="mt-2" :message="form.errors.password" />
-            </div>
-
-            <div class="mt-4 block">
-                <label class="flex items-center">
+                <!-- Remember Me Checkbox -->
+                <div class="flex items-center space-x-2">
                     <Checkbox name="remember" v-model:checked="form.remember" />
-                    <span class="ms-2 text-sm text-gray-600"
-                        >Remember me</span
+                    <span class="text-sm text-gray-600">Meni eslab qol</span>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="mt-6 flex justify-between items-center">
+                    <!-- Forgot Password Link -->
+                    <Link
+                        v-if="canResetPassword"
+                        :href="route('password.request')"
+                        class="text-sm text-indigo-600 hover:text-indigo-900 transition duration-300 ease-in-out"
                     >
-                </label>
-            </div>
+                        Parolni unutdingizmi?
+                    </Link>
 
-            <div class="mt-4 flex items-center justify-end">
-                <Link
-                    v-if="canResetPassword"
-                    :href="route('password.request')"
-                    class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                >
-                    Forgot your password?
-                </Link>
-
-                <PrimaryButton
-                    class="ms-4"
-                    :class="{ 'opacity-25': form.processing }"
-                    :disabled="form.processing"
-                >
-                    Log in
-                </PrimaryButton>
+                    <!-- Login Button -->
+                    <PrimaryButton
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white w-full py-2 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300 ease-in-out"
+                        :class="{ 'opacity-50': form.processing }"
+                        :disabled="form.processing"
+                    >
+                        Kirish
+                    </PrimaryButton>
+                </div>
             </div>
         </form>
     </GuestLayout>
 </template>
+
